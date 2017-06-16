@@ -1,22 +1,33 @@
-from flask import Flask
-from flask_restful import Resource, Api
-
 import requests
 
+from config import server, db_name, username, password, themoviedb_api_key
+from models import Comment
+from models import Movie
+
+
+from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
+
+
 app = Flask(__name__)
-api = Api(app)
+app.config['SQLALCHEMY_DATABASE_URI'] = f"mysql://{username}:{password}@{server}/{db_name}"
+db = SQLAlchemy(app)
 
-api_key = "b4cb68303a91f7b393e47305973fe19e"
 query = "all"
+url = f"https://api.themoviedb.org/3/search/movie?api_key={themoviedb_api_key}&query={query}"
 
-url = "https://api.themoviedb.org/3/search/movie?api_key={}&query={}".format(api_key, query)
 
-class Movies(Resource):
-    def get(self):
-        result = requests.get(url)
-        return result.json()
+def get_movies_from_themoviedb():
+    result = requests.get(url)
+    return result.json()
 
-api.add_resource(Movies, '/movies')
+
+def write_movies_to_db():
+    movies = get_movies_from_themoviedb()
+
+    for movie in movies:
+        pass
+
 
 if __name__ == '__main__':
     app.run(port=5000, debug=True)
