@@ -19,3 +19,9 @@ class Movie(db.Model):
         self.backdrop_path = backdrop_path
         self.rate = rate
         self.comments = comments
+
+    def exists(self):
+        return self.query.filter_by(id=self.id).first() is not None
+
+    def get_by_id(self, id):
+        return self.query.filter_by(id=id).first()
